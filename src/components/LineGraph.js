@@ -1,7 +1,7 @@
 import React from 'react';
 import { Line } from 'react-chartjs-2';
 
-export default function LineGraph() {
+export default function LineGraph(props) {
     return (
         <div
         style={{
@@ -32,7 +32,7 @@ export default function LineGraph() {
                         pointHoverBorderWidth: 2,
                         pointRadius: 1,
                         pointHitRadius: 10,
-                        data: [65, 59, 80, 81, 56, 55, 40]
+                        data: props.yAxis
                     }
                 ]
             }} />

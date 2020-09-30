@@ -13,6 +13,7 @@ function App() {
   const [covidSummary, setCovidSummary] = useState({});
   const [days, setDays] = useState(7);
   const [country, setCountry] = useState('');
+  const [coronaCountAr, setCoronaCountAr] = useState([]);
 
   useEffect(() => {
 
@@ -25,7 +26,7 @@ function App() {
 
           setTotalConfirmed(res.data.Global.TotalConfirmed);
           setTotalRecovered(res.data.Global.NewRecovered);
-          setTotalDeaths(res.data.Global.totalDeaths);
+          setTotalDeaths(res.data.Global.TotalDeaths);
           setCovidSummary(res.data);
 
         }
@@ -36,14 +37,48 @@ function App() {
       })
   }, []);
 
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = `0${d.getMonth() + 1}`.slice(-2);
+    const _date = d.getDate();
+    return `${year}-${month}-${_date}`;
+  }
+
   const countryHandler = (e) => {
     setCountry(e.target.value);
+    const d = new Date();
+    const to = formatDate(d);
+    const from = formatDate(d.setDate(d.getDate() - 7));
+
+    // console.log(from, to);
+
+    getCoronaReportByDateRange(e.target.value, from, to);
   }
 
   const daysHandler = (e) => {
     setDays(e.target.value);
-  } 
+  }
 
+  const getCoronaReportByDateRange = (countrySlug, from, to) => {
+
+    axios.get(`/country/${countrySlug}/status/confirmed?from=${from}T00:00:00Z&to=${to}T00:00:00Z`)
+      .then(res => {
+        console.log(res);
+
+        const yAxisCoronaCount = res.data.map(d => d.Cases);
+        const covidDetails = covidSummary.Countries.find(country => country.Slug === countrySlug);
+        setCoronaCountAr(yAxisCoronaCount);
+        setTotalConfirmed(covidDetails.TotalConfirmed);
+        setTotalRecovered(covidDetails.TotalRecovered);
+        setTotalDeaths(covidDetails.TotalDeaths);
+
+
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  }
 
   if (loading) {
     return <p>Fetching data from API</p>
@@ -72,11 +107,11 @@ function App() {
           <option value="30">Last 30 Days</option>
           <option value="90">Last 90 Days</option>
         </select>
-
-
       </div>
 
-      <LineGraph />
+      <LineGraph
+        yAxis={coronaCountAr}
+      />
     </div>
   );
 }
