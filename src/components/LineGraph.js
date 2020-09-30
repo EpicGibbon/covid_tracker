@@ -11,7 +11,7 @@ export default function LineGraph(props) {
     }}
         >
             <Line data={{
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: props.label.map(l => l.substr(0, 10)),
                 datasets: [
                     {
                         label: 'My First dataset',

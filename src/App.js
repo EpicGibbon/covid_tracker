@@ -14,23 +14,19 @@ function App() {
   const [days, setDays] = useState(7);
   const [country, setCountry] = useState('');
   const [coronaCountAr, setCoronaCountAr] = useState([]);
+  const [label, setLabel] = useState([]);
 
   useEffect(() => {
-
     setLoading(true);
     axios.get('/summary')
       .then(res => {
         setLoading(false)
-
         if (res.status === 200) {
-
           setTotalConfirmed(res.data.Global.TotalConfirmed);
           setTotalRecovered(res.data.Global.NewRecovered);
           setTotalDeaths(res.data.Global.TotalDeaths);
           setCovidSummary(res.data);
-
         }
-        console.log(res);
       })
       .catch(error => {
         console.log(error);
@@ -49,15 +45,17 @@ function App() {
     setCountry(e.target.value);
     const d = new Date();
     const to = formatDate(d);
-    const from = formatDate(d.setDate(d.getDate() - 7));
-
+    const from = formatDate(d.setDate(d.getDate() - days));
     // console.log(from, to);
-
     getCoronaReportByDateRange(e.target.value, from, to);
   }
 
   const daysHandler = (e) => {
     setDays(e.target.value);
+    const d = new Date();
+    const to = formatDate(d);
+    const from = formatDate(d.setDate(d.getDate() - e.target.value));
+    getCoronaReportByDateRange(country, from, to);
   }
 
   const getCoronaReportByDateRange = (countrySlug, from, to) => {
@@ -65,15 +63,14 @@ function App() {
     axios.get(`/country/${countrySlug}/status/confirmed?from=${from}T00:00:00Z&to=${to}T00:00:00Z`)
       .then(res => {
         console.log(res);
-
         const yAxisCoronaCount = res.data.map(d => d.Cases);
+        const xAxisLabel = res.data.map(d => d.Date)
         const covidDetails = covidSummary.Countries.find(country => country.Slug === countrySlug);
         setCoronaCountAr(yAxisCoronaCount);
         setTotalConfirmed(covidDetails.TotalConfirmed);
         setTotalRecovered(covidDetails.TotalRecovered);
         setTotalDeaths(covidDetails.TotalDeaths);
-
-
+        setLabel(xAxisLabel);
       })
       .catch(error => {
         console.log(error);
@@ -90,12 +87,12 @@ function App() {
         totalConfirmed={totalConfirmed}
         totalRecovered={totalRecovered}
         totalDeaths={totalDeaths}
-        country={'USA'}
+        country={country}
       />
-
 
       <div>
         <select value={country} onChange={countryHandler}>
+          <option value="">Select Country</option>
           {
             covidSummary.Countries && covidSummary.Countries.map(country =>
               <option key={country.Slug} value={country.Slug}>{country.Country}</option>
@@ -111,6 +108,7 @@ function App() {
 
       <LineGraph
         yAxis={coronaCountAr}
+        label={label}
       />
     </div>
   );
