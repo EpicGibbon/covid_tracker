@@ -21,7 +21,7 @@ export default function CovidSummary(props) {
                         justifyContent: 'center'
                     }}>
                         <Card>
-                            <span>Total Confirmed Cases</span>
+                            <span>Total Confirmed Cases </span>
                             <span>
                                 {
                                     <NumberFormat
@@ -33,7 +33,7 @@ export default function CovidSummary(props) {
                             </span>
                         </Card>
                         <Card>
-                            <span>Total Recovered Cases</span>
+                            <span>Total Recovered Cases </span>
                             <span>
                                 {
                                     <NumberFormat
@@ -45,7 +45,7 @@ export default function CovidSummary(props) {
                             </span>
                         </Card>
                         <Card>
-                            <span>Total Deaths Cases</span>
+                            <span>Total Deaths Cases </span>
                             <span>
                                 {
                                     <NumberFormat
